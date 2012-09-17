@@ -1,0 +1,108 @@
+{% extends "layout.html" %}
+{% block body %}
+{% if current_user.is_authenticated() %}
+<div id="dialog-confirm">
+	<p><span class="ui-icon ui-icon-alert" style="float:left; margin:0 7px 20px 0;"></span>This post will be permanently deleted and cannot be recovered. Are you sure?</p>
+</div>
+<!--Admin user-->
+	{% if entry_id %}
+	<!--update selected post-->
+    <form id='post_form' action="{{ url_for('edit_entry', entry_id=entry_id) }}" method=post class=edit-entry>
+      <dl>		
+        <dt>Title:&nbsp;<span class="required">*</span>
+        <dd><input type=text size=30 name=title value="{{ selected_entry.title }}">			
+        <dt>Text:
+        <dd><textarea name=text rows=5 cols=40 >{{ selected_entry.text }}</textarea>
+        <dd><input type=submit value=Update>
+      </dl>
+    </form>
+	<a class='add_entry_page' href="{{ url_for('show_entries') }}" >Add New Post</a>
+	{% else %}
+	<!--add new post-->
+	<form id='post_form' action="{{ url_for('add_entry') }}" method=post class=add-entry>
+      <dl>
+        <dt>Title:&nbsp;<span class="required">*</span>
+        <dd><input type=text size=30 id='title' name='title' >
+		<dt>Tags (Separate tags by commas): 
+        <dd><input type=text size=30 name=tags > 
+		
+        <dt>Text:
+        <dd><textarea name=text rows=5 cols=40 ></textarea>
+        <dd><input type=submit value=Share>
+      </dl>
+    </form>
+	{% endif %}
+
+	<ul class=entries>	
+	
+	{% for entry in entries %}
+	<!--iterate posts for admin-->
+	<!--post title-->
+    <li><h2>{{ entry.title }}</h2>
+	<!--post text-->
+	<div class='entry_text'>
+	<a id='entry_text_more' href="{{ url_for('show_post', entry_id=entry.id) }}" >
+	{{ entry.text|safe }}
+	</a>
+	</div>
+	<br />
+	<!--edit and delete button for one post-->
+	<a href="{{ url_for('edit_entry', entry_id=entry.id) }}">Edit</a>&nbsp;&nbsp;&nbsp;<a id="delete_entry" name="{{entry.id}}" href="{{ url_for('delete_entry', entry_id=entry.id) }}">Delete</a>
+	<!--tags for this post-->
+	<li><div class='tag_area_{{ entry.id }}' id='tag_area_{{ entry.id }}'>Tags:
+		{% for tag in entry.EntryContent.tag_lists %}
+			{% if tag.id == entry.EntryContent.tag_lists[-1].id %}
+				{{ tag.name}} 
+			{% else %}
+				{{ tag.name}},
+			{% endif %}
+		{% endfor %}
+		<!--edit button for tags-->
+		<a id='edit_tags_btn' href='javascript:void(0)' name='{{ entry.id }}'>Edit Tags</a>
+		</div>
+		
+		<!--area for editting tags-->
+		<div class='tag_edit_area_{{ entry.id }}'>
+		<form id='update_tags_form_{{ entry.id }}' action="{{ url_for('edit_tags', entry_id=entry.id) }}" method=post style='display:none'>
+			<textarea id='update_tags_text_area_{{ entry.id }}' name=tags rows=2 style='width:405px;display:none'>
+			{% for tag in entry.EntryContent.tag_lists %}{{tag.name}},{% endfor %}
+			</textarea>			
+			<input class='update_tags_btn' id='update_tags_btn_{{ entry.id }}' type=submit value="Update Tags" style='display:none'>
+		</form>
+		<div id='cancel_tags_btn'  class='cancel_button_text_{{ entry.id }}' name='{{ entry.id }}'></div>
+		</div>
+	{% else %}
+    <li><em>Unbelievable.  No posts here so far</em> 
+	{% endfor %}
+	</ul>
+{% else %}
+<!--normal visitor-->
+	<ul class=entries>
+	{% for entry in entries %}
+	<!--iterate posts for visitor-->
+	<!--post title-->
+    <li><h2>{{ entry.title }}</h2>
+	<!--post text-->
+	<div class='entry_text'>
+	<a id='entry_text_more' href="{{ url_for('show_post', entry_id=entry.id) }}">
+	{{ entry.text|safe }}
+	</a>
+	</div>	
+	<!--post tags-->
+	<li><div class='tag_area_{{ entry.id }}' id='tag_area_{{ entry.id }}'>Tags:
+		{% for tag in entry.EntryContent.tag_lists %}
+			{% if tag.id == entry.EntryContent.tag_lists[-1].id %}
+				{{ tag.name}} 
+			{% else %}
+				{{ tag.name}},
+			{% endif %}
+		{% endfor %}
+		</div>
+	{% else %}
+    <li><em>Unbelievable.  No posts here so far</em> 
+	{% endfor %}
+	</ul>
+	
+{% endif %}
+
+{% endblock %}

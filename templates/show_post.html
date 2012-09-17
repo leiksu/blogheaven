@@ -1,0 +1,17 @@
+{% extends "layout.html" %}
+{% block body %}
+<ul class=entries>	
+<li><h2>{{entry.title}}</h2>
+<div class='entry_entire_text'>
+{{entry.text}}
+</div>
+<li><div class='tag_area_{{ entry.id }}' id='tag_area_{{ entry.id }}'>Tags:
+		{% for tag in entry.EntryContent.tag_lists %}
+			{% if tag.id == entry.EntryContent.tag_lists[-1].id %}
+				{{ tag.name}} 
+			{% else %}
+				{{ tag.name}},
+			{% endif %}
+		{% endfor %}
+<li><a id='back' href='{{ url_for('show_entries') }}' '>Back</a>
+{% endblock %}
