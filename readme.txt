@@ -16,5 +16,3 @@ After following five steps, the application is ready to be used
 
 usename: leiksu
 password: default
-
-This application runs under Windows environment
